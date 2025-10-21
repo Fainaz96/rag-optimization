@@ -1,0 +1,197 @@
+{
+  "name": "RAG Agent with Contextual Retrieval",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "ed700be4-078e-435a-93c5-65f0bdfd0a1a",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        300,
+        300
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "KFbKqZ9x6f3v1uz7",
+          "name": "Datascout OpenAI Key"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "9000b302-1408-449d-a8ee-2ef99b70c622",
+      "name": "Postgres Chat Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1,
+      "position": [
+        480,
+        300
+      ],
+      "notesInFlow": false,
+      "credentials": {
+        "postgres": {
+          "id": "eYtZ9lIUuQhwLT18",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## RAG AI Agent with Contextual Retrieval",
+        "height": 485,
+        "width": 1036
+      },
+      "id": "52ced627-8946-4672-99fe-9fd328f85526",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=## Role\n\nYou are a Retrieval-Augmented Generation (RAG) assistant designed to answer questions a user has. You use a corpus of documents that are all text based. Your primary goal is to provide accurate, up-to-date, and relevant information based on what the user asks and the documents you retrieve.\n\n## Responsibilities\n\n- Answer user queries with a good mix of being comprehensive but still concise\n- Present information in an easy-to-understand and professional manner  \n- Clarify misconceptions or misinformation\n\n## Other Key Information and Instructions\n\n- Always tell the user if you didn't find the answer. Don't make something up just to please them.\n- Keep your language neutral and factual. Do not show bias or opinion  \n\n## Error Handling\n- If the information cannot be found using the provided instructions respond with:  \n  “I’m sorry, I couldn’t find relevant information based on your documents.”\n"
+        }
+      },
+      "id": "40399155-aedd-466e-aac1-b9ae5a98aa09",
+      "name": "RAG AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        380,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        740,
+        320
+      ],
+      "id": "8cc9e1ac-7e5c-444c-8a66-f36916890afb",
+      "name": "Embeddings OpenAI2",
+      "credentials": {
+        "openAiApi": {
+          "id": "KFbKqZ9x6f3v1uz7",
+          "name": "Datascout OpenAI Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "id": "bd8fbed6-a532-49c0-898c-920c17f74631",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        100,
+        80
+      ],
+      "webhookId": "2e7c037a-cf2e-40c5-9bed-e0944cc03cfa"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "datascout",
+        "toolDescription": "Work with you data in Supabase vector store",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.1,
+      "position": [
+        700,
+        140
+      ],
+      "id": "607ce849-0f73-4d27-a3e4-b8340d78afa3",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "HX9RFXP4U1sUBCzv",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "RAG AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        []
+      ]
+    },
+    "Embeddings OpenAI2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "RAG AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "RAG AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e88138df-5ab4-42bc-9bbb-78d9a2927963",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "14f55bf22a386228252427eabc606d44dd20464112e55018eba9edda9a766b6f"
+  },
+  "id": "7goORo9mWHV7B2t2",
+  "tags": []
+}
